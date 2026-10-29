@@ -26,8 +26,11 @@
   .hero{width:84px;height:84px;margin:0 auto;position:relative;background:transparent}
   .hero svg{width:100%;height:100%;display:block}
   .creature svg{width:100%;height:100%;display:block}
-  .hero.lunge{animation:lunge .25s}
-  @keyframes lunge{50%{transform:translateX(18px)}}
+  .hero.lunge{animation:swordSwing .35s ease-out}
+  @keyframes swordSwing{0%{transform:rotate(0deg) translateX(0)}25%{transform:rotate(-16deg) translateX(4px)}55%{transform:rotate(14deg) translateX(18px)}100%{transform:rotate(0deg) translateX(0)}}
+  .slash{position:absolute;left:50%;top:32%;width:92px;height:10px;margin-left:-46px;border-radius:99px;background:linear-gradient(90deg,transparent,#fff,#7DD3FC,transparent);box-shadow:0 0 12px rgba(125,211,252,.9);transform:rotate(-38deg);transform-origin:center;animation:slashAnim .3s ease-out forwards;pointer-events:none}
+  .slash.crit{background:linear-gradient(90deg,transparent,#fff,#FDE68A,#F59E0B,transparent);box-shadow:0 0 16px rgba(245,158,11,.95);width:110px;margin-left:-55px}
+  @keyframes slashAnim{0%{opacity:0;transform:rotate(-38deg) scaleX(.3)}30%{opacity:1;transform:rotate(-38deg) scaleX(1.15)}100%{opacity:0;transform:rotate(-38deg) scaleX(1.3) translateY(8px)}}
   .creatureWrap{margin:0 auto}
   .anim-wobble{animation:wobble 1.6s infinite}
   .anim-floaty{animation:floaty 1.8s infinite}
@@ -381,6 +384,10 @@ function onKill(){
   const burstEl=document.createElement('span'); burstEl.className='burst'; burstEl.textContent='击败!'; const ml=document.getElementById('monsterDmgLayer'); if(ml){ ml.appendChild(burstEl); setTimeout(()=>burstEl.remove(),900); }
   spawnMonster(); save(); render();
 }
+function showSlash(isCrit){
+  const layer=document.getElementById('monsterDmgLayer'); if(!layer) return;
+  const el=document.createElement('span'); el.className='slash'+(isCrit?' crit':''); layer.appendChild(el); setTimeout(()=>el.remove(),320);
+}
 function showDmg(target, n, color, prefix){
   const layer=document.getElementById(target==='hero'?'heroDmgLayer':'monsterDmgLayer'); if(!layer) return;
   const s=document.createElement('span'); s.className='dmg';
@@ -513,7 +520,7 @@ function tick(){
     let dmg=Math.max(1,Math.round((st.atk-monster.def)*(0.8+Math.random()*0.4)));
     if(isCrit) dmg*=2;
     if(isHeavy) dmg*=3;
-    monster.hp-=dmg; showDmg('monster', dmg, null, isCrit&&isHeavy?'暴击重击':isCrit?'暴击':isHeavy?'重击':null);
+    monster.hp-=dmg; showDmg('monster', dmg, null, isCrit&&isHeavy?'暴击重击':isCrit?'暴击':isHeavy?'重击':null); showSlash(isCrit);
     if(st.lifesteal){ S.hp=Math.min(st.maxHp, S.hp+Math.round(dmg*(st.lifesteal||0)/100)); }
     const c=document.getElementById('creature'); if(c){ c.classList.remove('hit'); void c.offsetWidth; c.classList.add('hit'); }
     const h=document.getElementById('hero'); if(h){ h.classList.remove('lunge'); void h.offsetWidth; h.classList.add('lunge'); }
