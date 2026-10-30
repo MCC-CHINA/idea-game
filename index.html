@@ -591,5 +591,30 @@ setInterval(save,5000);
 document.addEventListener('visibilitychange',()=>{if(document.hidden) save();});
 window.addEventListener('beforeunload',save);
 </script>
+
+<style>
+body{padding-bottom:76px}
+#bottomNav{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid #E5E5EA;padding:8px 8px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(0,0,0,.06)}
+#bottomNav button{flex:1;border:0;background:transparent;font-size:14px;color:#8E8E93;padding:8px 0;cursor:pointer}
+#bottomNav button.active{color:#007AFF;font-weight:600}
+</style>
+<nav id="bottomNav">
+<button data-tab="equip" class="active">已装备</button>
+<button data-tab="bag">背包</button>
+<button data-tab="talent">天赋</button>
+<button data-tab="ach">成就</button>
+</nav>
+<script>
+(function(){
+  function cardWith(id){ var el=document.getElementById(id); return el ? el.closest('.card') : null; }
+  var panels={equip:cardWith('slot-weapon'),bag:cardWith('bag'),talent:cardWith('talents'),ach:cardWith('achievements')};
+  function showTab(tab){
+    Object.keys(panels).forEach(function(k){ if(panels[k]) panels[k].style.display=(k===tab?'block':'none'); });
+    document.querySelectorAll('#bottomNav button').forEach(function(b){ b.classList.toggle('active', b.dataset.tab===tab); });
+  }
+  document.querySelectorAll('#bottomNav button').forEach(function(b){ b.onclick=function(){ showTab(b.dataset.tab); }; });
+  showTab('equip');
+})();
+</script>
 </body>
 </html>
